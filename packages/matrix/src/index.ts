@@ -4,10 +4,10 @@ config();
 
 class PrometheusService {
   public registry: promClient.Registry;
-  public gateway: promClient.Pushgateway<string | any> ;
+  public gateway: promClient.Pushgateway<string | any>;
 
   // HTTP Metrics
-  public req_res_time: promClient.Histogram<'method' | 'route' | 'status_code'>;
+  public req_res_time: promClient.Histogram<"method" | "route" | "status_code">;
 
   // WebSocket Metrics
   public ws_connections: promClient.Counter<string>;
@@ -16,9 +16,9 @@ class PrometheusService {
   public ws_active_connections: promClient.Gauge<string>;
 
   // Kafka / Trade Metrics
-  public trade_processing_duration: promClient.Histogram<'topic'>;
-  public kafka_messages_consumed: promClient.Counter<'topic'>;
-  public kafka_messages_produced: promClient.Counter<'topic'>;
+  public trade_processing_duration: promClient.Histogram<"topic">;
+  public kafka_messages_consumed: promClient.Counter<"topic">;
+  public kafka_messages_produced: promClient.Counter<"topic">;
   public trade_tp_triggered: promClient.Counter<string>;
   public trade_sl_triggered: promClient.Counter<string>;
   public trade_hold: promClient.Counter<string>;
@@ -30,7 +30,11 @@ class PrometheusService {
     if (!process.env.CLIENT_URL) {
       throw new Error("CLIENT_URL environment variable is required");
     }
-    this.gateway = new promClient.Pushgateway(process.env.CLIENT_URL, {}, this.registry);
+    this.gateway = new promClient.Pushgateway(
+      process.env.CLIENT_URL,
+      {},
+      this.registry
+    );
 
     // Collect default metrics
     promClient.collectDefaultMetrics({ register: this.registry });
@@ -103,10 +107,11 @@ class PrometheusService {
     });
   }
 
-  
-   //Push metrics to Prometheus PushGateway
-  
-  public async pushMetrics(jobName = "service_metrics") {
+  //Push metrics to Prometheus PushGateway
+
+  public async ptrade_processing_durationushMetrics(
+    jobName = "service_metrics"
+  ) {
     try {
       await this.gateway.pushAdd({
         jobName,
@@ -118,16 +123,19 @@ class PrometheusService {
     }
   }
 
-  
-    // Create custom job metrics with counter + duration histogram
-   
+  // Create custom job metrics with counter + duration histogram
+
   public createJobMetrics(job_name: string) {
     if (!/^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(job_name)) {
       throw new Error(`Invalid job_name "${job_name}"`);
     }
 
     const jobRegistry = new promClient.Registry();
-    const jobGateway = new promClient.Pushgateway(process.env.CLIENT_URL!, {}, jobRegistry);
+    const jobGateway = new promClient.Pushgateway(
+      process.env.CLIENT_URL!,
+      {},
+      jobRegistry
+    );
 
     const jobCounter = new promClient.Counter({
       name: `${job_name}_runs_total`,

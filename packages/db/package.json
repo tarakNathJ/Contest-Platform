@@ -1,5 +1,5 @@
 {
-  "name": "db",
+  "name": "@db/contest-platform",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -18,8 +18,11 @@
     "drizzle-orm": "^0.45.1",
     "pg": "^8.16.3"
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "push": "bun drizzle-kit push",
     "migrate": "bun drizzle-kit migrate",
     "generate": "bun drizzle-kit generate"

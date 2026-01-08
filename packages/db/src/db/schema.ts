@@ -1,3 +1,4 @@
+
 import {
   boolean,
   integer,
@@ -13,7 +14,7 @@ export const usersTable = pgTable(
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name", { length: 255 }).notNull(),
-    age: integer("age").notNull(),
+    password:varchar("password").notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     is_active: boolean("is_active").notNull(),
     role: roleEnum("role").notNull(),
