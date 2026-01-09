@@ -1,7 +1,6 @@
 import express from "express";
 import type { Express } from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import routers from "./router/index.route";
 import { PrometheusService } from "@matrix/contestplatfrom";
 import responceTime from "response-time";
@@ -35,9 +34,7 @@ class express_app {
     );
 
     this.app.use(express.json());
-    this.app.use(cookieParser());
     this.app.use("/api/auth", routers);
-
     this.app.get("/metrics", async (req, res) => {
       try {
         res.set("Content-Type", matrix.registry.contentType);

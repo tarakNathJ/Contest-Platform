@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import type { type_of_asyncFunction } from "@type-of/contest-platform";
 
 
-export const asyncFunction =
+export const async_function =
   (func: type_of_asyncFunction) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -1,13 +1,15 @@
 {
-  "name": "auth.services",
-  "module": "src/index.ts",
+  "name": "contest_management.services",
+  "module": "index.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "nodemon": "^3.1.11"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@db/contest-platform": "workspace:*",
@@ -15,22 +17,13 @@
     "@kafka_instance/contestplatfrom": "workspace:*",
     "@matrix/contestplatfrom": "workspace:*",
     "@type-of/contest-platform": "workspace:*",
-    "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/response-time": "^2.3.9",
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "response-time": "^2.3.4"
-  },
-  "scripts": {
-    "dev": "nodemon --exec \"bun run start\" --ext ts --watch src",
-    "start": "tsc && bun dist/index.js"
   }
 }

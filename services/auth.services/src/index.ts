@@ -1,4 +1,4 @@
-import { express_app } from "./app.js"
+import { express_app } from "./app"
 import { config } from "dotenv"
 
 config({
