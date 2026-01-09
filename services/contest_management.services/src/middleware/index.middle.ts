@@ -31,7 +31,6 @@ export const verify_JWT =async_function (async (req, _, next) => {
       .select({
         role: usersTable.role,
         id: usersTable.id,
-        email: usersTable.email,
       })
       .from(usersTable)
       .where(eq(usersTable.email, decodedToken.email));

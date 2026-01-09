@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import { config } from "dotenv";
 import {
-  asyncFunction,
+  async_function,
   api_error,
   api_responce,
 } from "@handler/contest-platform";
@@ -13,7 +13,7 @@ config();
 
 // sign up controller
 
-export const sign_up_controller = asyncFunction(async (req, res) => {
+export const sign_up_controller = async_function(async (req, res) => {
   const { email, name, password, role = "user" } = req.body;
 
   //chack email and name field are exist or not
@@ -91,7 +91,7 @@ export const sign_up_controller = asyncFunction(async (req, res) => {
 
 // login controller
 
-export const login_controller = asyncFunction(async (req, res) => {
+export const login_controller = async_function(async (req, res) => {
   const { email, password } = req.body;
 
   // chack required fields
@@ -151,7 +151,7 @@ export const login_controller = asyncFunction(async (req, res) => {
 });
 
 // forgot password
-export const change_user_password = asyncFunction(async (req, res) => {
+export const change_user_password = async_function(async (req, res) => {
   // chack fields
   // chack email are exist or not then compare this  password
   // if  password match  then hash new password and update on our database
