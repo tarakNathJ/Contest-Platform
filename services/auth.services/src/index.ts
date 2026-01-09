@@ -1,14 +1,13 @@
-import { express_app } from "./app"
-import { config } from "dotenv"
+import { express_app } from "./app";
+import { config } from "dotenv";
 
 config({
-    path:"./.env"
-})
-
+  path: "./.env",
+});
 
 // @ts-ignore
-const PORT = parseInt(process.env.PORT) 
+const PORT = parseInt(process.env.PORT);
 
-new express_app().app.listen(PORT || 4000, "0.0.0.0" , ()=>{
-    console.log("server start at :" , PORT);
-})
+new express_app().app.listen(PORT || 4000, "0.0.0.0", () => {
+  console.log("server start at :", PORT);
+});

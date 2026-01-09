@@ -5,10 +5,17 @@ import {
   varchar,
   pgEnum,
   uniqueIndex,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { index } from "drizzle-orm/pg-core";
 export const roleEnum = pgEnum("role", ["admin", "user", "organizer"]);
 export const statusEnum = pgEnum("status", ["activate", "deactivate"]);
+export const answerEnum = pgEnum("answer", [
+  "option1",
+  "option2",
+  "option3",
+  "option4",
+]);
 export const usersTable = pgTable(
   "users",
   {
@@ -29,11 +36,11 @@ export const contestTable = pgTable(
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("userId")
-      .references(() => usersTable.id)
-      .notNull(),
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
     contestName: varchar("contestName", { length: 50 }).notNull().unique(),
     description: varchar("description"),
-    startTime: boolean("startTime").notNull(),
+    startTime: timestamp("startTime", { withTimezone: true }).notNull(),
     is_active: boolean("is_active").notNull(),
     status: statusEnum("status").notNull(),
   },
@@ -48,13 +55,14 @@ export const mcqTable = pgTable(
   "mcq",
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-    contestIdx: integer("contestIdx")
-      .references(() => contestTable.id)
-      .notNull(),
+    contestId: integer("contestId")
+      .notNull()
+      .references(() => contestTable.id, { onDelete: "cascade" }),
+
     userId: integer("userId")
-      .references(() => usersTable.id)
-      .notNull(),
-    title: varchar("title").notNull(),
+      .notNull()
+      .references(() => usersTable.id),
+    title: varchar("title", { length: 255 }).notNull(),
     description: varchar("description").notNull(),
     option1: varchar("option1").notNull(),
     option2: varchar("option2").notNull(),
@@ -63,19 +71,37 @@ export const mcqTable = pgTable(
     ans: varchar("ans").notNull(),
   },
   (table) => ({
-    title_contest_id: uniqueIndex("title_contest_unique").on(
-      table.contestIdx,
+    contestIdIdx: index("mcq_contest_id_idx").on(table.contestId), // This is correct
+    userIdIdx: index("mcq_user_id_idx").on(table.userId),
+
+    uniqueTitlePerContest: uniqueIndex("mcq_unique_title_per_contest").on(
+      table.contestId,
       table.title
     ),
   })
 );
+export const userAnswerTable = pgTable(
+  "user_ans",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 
-export const userAnswerTable = pgTable("user_ans", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  mcqTableId: integer("mcqTableId")
-    .references(() => mcqTable.id)
-    .notNull(),
-  ans: varchar("ans").notNull(),
-  optionId: varchar("optionId").notNull(),
-  right_or_wrong: boolean("right_or_wrong").notNull(),
-});
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    mcqId: integer("mcqId")
+      .notNull()
+      .references(() => mcqTable.id, { onDelete: "cascade" }),
+    ans: varchar("ans").notNull(),
+    selectedAnswer: answerEnum("selected_answer").notNull(),
+    isCorrect: boolean("is_correct").notNull(),
+  },
+  (table) => ({
+    mcqIdIdx: index("user_answers_mcq_id_idx").on(table.mcqId),
+    userIdIdx: index("user_answers_user_id_idx").on(table.userId),
+
+    oneAttemptPerUser: uniqueIndex("user_answers_unique_mcq_user").on(
+      table.mcqId,
+      table.userId
+    ),
+  })
+);

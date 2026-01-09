@@ -1,5 +1,5 @@
 {
-  "id": "6c9d5ae7-78af-4219-af50-ae228e6e69e1",
+  "id": "fce057d1-f211-4eda-84bb-7cd96d458fa2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -29,23 +29,36 @@
           "name": "userId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "contestId": {
-          "name": "contestId",
+        "contestName": {
+          "name": "contestName",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "startTime": {
           "name": "startTime",
-          "type": "boolean",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
         },
         "is_active": {
           "name": "is_active",
           "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         }
@@ -70,13 +83,34 @@
           "name": "contestIdx",
           "columns": [
             {
-              "expression": "contestId",
+              "expression": "contestName",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
               "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contestNameIdx": {
+          "name": "contestNameIdx",
+          "columns": [
+            {
+              "expression": "contestName",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "userId",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -99,17 +133,17 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "contest_contestId_unique": {
-          "name": "contest_contestId_unique",
+        "contest_contestName_unique": {
+          "name": "contest_contestName_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "contestId"
+            "contestName"
           ]
         }
       },
@@ -138,17 +172,29 @@
             "cycle": false
           }
         },
-        "contestIdx": {
-          "name": "contestIdx",
+        "contestId": {
+          "name": "contestId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "userId": {
           "name": "userId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
         },
         "option1": {
           "name": "option1",
@@ -181,19 +227,71 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "mcq_contest_id_idx": {
+          "name": "mcq_contest_id_idx",
+          "columns": [
+            {
+              "expression": "contestId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "mcq_user_id_idx": {
+          "name": "mcq_user_id_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "mcq_unique_title_per_contest": {
+          "name": "mcq_unique_title_per_contest",
+          "columns": [
+            {
+              "expression": "contestId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "title",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "mcq_contestIdx_contest_contestId_fk": {
-          "name": "mcq_contestIdx_contest_contestId_fk",
+        "mcq_contestId_contest_id_fk": {
+          "name": "mcq_contestId_contest_id_fk",
           "tableFrom": "mcq",
           "tableTo": "contest",
           "columnsFrom": [
-            "contestIdx"
-          ],
-          "columnsTo": [
             "contestId"
           ],
-          "onDelete": "no action",
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "mcq_userId_users_id_fk": {
@@ -237,8 +335,14 @@
             "cycle": false
           }
         },
-        "mcqTableId": {
-          "name": "mcqTableId",
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mcqId": {
+          "name": "mcqId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -248,10 +352,102 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "selected_answer": {
+          "name": "selected_answer",
+          "type": "answer",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_correct": {
+          "name": "is_correct",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
+      "indexes": {
+        "user_answers_mcq_id_idx": {
+          "name": "user_answers_mcq_id_idx",
+          "columns": [
+            {
+              "expression": "mcqId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_answers_user_id_idx": {
+          "name": "user_answers_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_answers_unique_mcq_user": {
+          "name": "user_answers_unique_mcq_user",
+          "columns": [
+            {
+              "expression": "mcqId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_ans_user_id_users_id_fk": {
+          "name": "user_ans_user_id_users_id_fk",
+          "tableFrom": "user_ans",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_ans_mcqId_mcq_id_fk": {
+          "name": "user_ans_mcqId_mcq_id_fk",
+          "tableFrom": "user_ans",
+          "tableTo": "mcq",
+          "columnsFrom": [
+            "mcqId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -285,9 +481,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "age": {
-          "name": "age",
-          "type": "integer",
+        "password": {
+          "name": "password",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -345,6 +541,16 @@
     }
   },
   "enums": {
+    "public.answer": {
+      "name": "answer",
+      "schema": "public",
+      "values": [
+        "option1",
+        "option2",
+        "option3",
+        "option4"
+      ]
+    },
     "public.role": {
       "name": "role",
       "schema": "public",
@@ -352,6 +558,14 @@
         "admin",
         "user",
         "organizer"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "activate",
+        "deactivate"
       ]
     }
   },

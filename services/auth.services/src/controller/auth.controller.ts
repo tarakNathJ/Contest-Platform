@@ -7,7 +7,7 @@ import {
   api_error,
   api_responce,
 } from "@handler/contest-platform";
-import { password } from "bun";
+
 
 config();
 

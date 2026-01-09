@@ -27,8 +27,8 @@ const redis_connect = await redis_instance.connect();
 const create_contest = async_function(async (req, res) => {
   // @ts-ignore
   const userId = req.user.id;
-  const { contest_name, startTime, description } = req.body();
-  if (!contest_name || !userId || !description) {
+  const { contest_name, startTime, description, status } = req.body;
+  if (!contest_name || !userId || !description || !status) {
     new api_error(400, "All required fields must be provided.");
   }
 
@@ -37,24 +37,26 @@ const create_contest = async_function(async (req, res) => {
     .from(contestTable)
     .where(
       and(
-        eq(contestTable.contestName, contestTable),
+        eq(contestTable.contestName, contest_name),
         eq(contestTable.userId, userId)
       )
     );
+
   if (find_this_contest_name_exist_or_not_for_this_organizer) {
     new api_error(409, " this name allrady exist");
   }
+
   const [create_new_contest_for_this_organizer] = await db
     .insert(contestTable)
     .values({
       userId: userId,
       contestName: contest_name,
       description: description,
+      startTime: new Date(startTime),
       is_active: true,
-      startTime: startTime,
-      status: statusEnum.enumValues[0],
+      status: status,
     })
-    .returning({ name: contestTable.contestName, id: contestTable.id });
+    .returning({ id: contestTable.id, title: contestTable.contestName });
 
   if (!create_new_contest_for_this_organizer) {
     throw new api_error(507, "db operation failed");
@@ -129,8 +131,8 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
     .values({
       title: title,
       description: description,
+      contestId: contest_exist_or_not_for_this_user.id,
       userId: userId,
-      contestIdx: contest_exist_or_not_for_this_user.id,
       option1: option1,
       option2: option2,
       option3: option3,
@@ -138,7 +140,7 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
       ans: ans,
     })
     .onConflictDoUpdate({
-      target: [mcqTable.contestIdx, mcqTable.title],
+      target: [mcqTable.contestId, mcqTable.title],
       set: {
         description: description,
         option1: option1,
@@ -187,10 +189,10 @@ const get_mcqs_by_contest_id = async_function(async (req, res) => {
     throw new api_error(404, " contest are not exist  ");
   }
 
-  const [get_all_mcq_for_this_contestTable] = await db
+  const get_all_mcq_for_this_contestTable = await db
     .select()
     .from(mcqTable)
-    .where(eq(mcqTable.contestIdx, chack_contest_are_exist_or_not.id));
+    .where(eq(mcqTable.contestId, chack_contest_are_exist_or_not.id));
   return res
     .status(200)
     .json(
@@ -204,16 +206,19 @@ const get_mcqs_by_contest_id = async_function(async (req, res) => {
 const submit_user_answer = async_function(async (req, res) => {
   // @ts-ignore
   const userId = req.user.id;
-  const qustionId = req.params;
-  const contestId = req.params;
+  const qustionId = req.params.qustionId;
+  const contestId = req.params.contestId;
+
   const { ans, optionId } = req.body;
-  if (!qustionId || !userId || !ans || !optionId) {
+  if (!qustionId || !userId || !ans || !optionId || !contestId) {
     throw new api_error(400, "All required fields must be provided.");
   }
+  console.log(qustionId, contestId, ans, optionId);
 
   const get_contest_exist_or_not: Tmcq[] | any = await redis_instance.getJSON(
     `${contestId}`
   );
+
   if (get_contest_exist_or_not) {
     const find_qustion_details = get_contest_exist_or_not.filter(
       //@ts-ignore
@@ -241,20 +246,23 @@ const submit_user_answer = async_function(async (req, res) => {
       })
       .from(mcqTable)
       //@ts-ignore
-      .where(eq(mcqTable.contestIdx, parseInt(contestId)));
+      .where(eq(mcqTable.contestId, parseInt(contestId)));
+
     redis_instance.setJSON(`${contestId}`, get_all_qustion_by_contest_id, 60);
+
     const find_qustion_details = get_all_qustion_by_contest_id.filter(
       //@ts-ignore
       (data) => data.id == parseInt(qustionId)
     );
 
     const save_user_answer = await db.insert(userAnswerTable).values({
-      //@ts-ignore
-      mcqTableId: parseInt(qustionId),
+      mcqId: parseInt(qustionId),
+      userId: userId,
       ans: ans,
-      optionId: optionId,
-      right_or_wrong: find_qustion_details[0]?.ans == ans.trim() ? true : false,
+      selectedAnswer: optionId,
+      isCorrect: find_qustion_details[0]?.ans == ans.trim() ? true : false,
     });
+
     return res
       .status(201)
       .json(new api_responce(201, {}, "Data saved successfully"));

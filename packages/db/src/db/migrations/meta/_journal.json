@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1767906135801,
-      "tag": "0000_foamy_sage",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1767910314026,
-      "tag": "0001_equal_mesmero",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1767956074637,
-      "tag": "0002_complex_argent",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1767957741316,
-      "tag": "0003_mixed_mimic",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1767958812639,
-      "tag": "0004_redundant_otto_octavius",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1767962456674,
-      "tag": "0005_condemned_captain_universe",
+      "when": 1767981810961,
+      "tag": "0000_concerned_moonstone",
       "breakpoints": true
     }
   ]

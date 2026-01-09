@@ -25,6 +25,6 @@ routers
 routers
   .route("/add-qustion")
   .post(verify_JWT, isOrganizer, add_and_update_mcq_to_contest);
-routers.route("/submit-answer").post(verify_JWT, isUser, submit_user_answer);
+routers.route("/submit-answer/:qustionId/:contestId").post(verify_JWT, isUser, submit_user_answer);
 
 export default routers;

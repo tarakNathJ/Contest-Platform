@@ -26,5 +26,9 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "response-time": "^2.3.4"
+  },
+  "scripts": {
+    "dev": "nodemon --exec \"bun run start\" --ext ts --watch src",
+    "start": "tsc && bun src/index.ts"
   }
 }
