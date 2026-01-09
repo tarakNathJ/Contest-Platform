@@ -9,7 +9,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { index } from "drizzle-orm/pg-core";
 export const roleEnum = pgEnum("role", ["admin", "user", "organizer"]);
-export const statusEnum = pgEnum("status", ["activate", "deactivate"]);
+export const statusEnum = pgEnum("status", [
+  "activate",
+  "completed",
+  "started",
+  "pending",
+  "deactivate",
+]);
+
 export const answerEnum = pgEnum("answer", [
   "option1",
   "option2",

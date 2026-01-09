@@ -15,20 +15,19 @@ export type type_for_responce = {
   stack?: string | null;
 };
 
+export enum Tstatus {
+  Activate = "activate",
+  Completed = "completed",
+  Started = "started",
+  Pending = "pending",
+  Deactivate = "deactivate",
+}
 
-type Card = string;
-
-type PlayerCards = Card[];
- 
-export  type poker_table_data_for_Cash_Game  = {
-  tablename: string;
-  communityCards: Card[];          // exactly 5 cards in real game
-  players: {
-    player1: PlayerCards;
-    player2: PlayerCards;
-    player3: PlayerCards;
-    player4: PlayerCards;
-  };
-  total_chips: number;
-  game_type: "Cash Game" | "Tournament";
-};
+export interface TcontestTable {
+  id: number;
+  userId: number;
+  contestName: string;
+  startTime: Date;
+  is_active: boolean;
+  status: Tstatus;
+}

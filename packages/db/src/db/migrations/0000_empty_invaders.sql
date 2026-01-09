@@ -1,6 +1,6 @@
 CREATE TYPE "public"."answer" AS ENUM('option1', 'option2', 'option3', 'option4');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('admin', 'user', 'organizer');--> statement-breakpoint
-CREATE TYPE "public"."status" AS ENUM('activate', 'deactivate');--> statement-breakpoint
+CREATE TYPE "public"."status" AS ENUM('activate', 'completed', 'started', 'pending', 'deactivate');--> statement-breakpoint
 CREATE TABLE "contest" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "contest_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"userId" integer NOT NULL,

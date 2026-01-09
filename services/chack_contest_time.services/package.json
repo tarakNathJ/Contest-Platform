@@ -1,0 +1,22 @@
+{
+  "name": "chack_contest_time.services",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@db/contest-platform": "workspace:*",
+    "@kafka_instance/contestplatfrom": "workspace:*",
+    "@type-of/contest-platform": "workspace:*",
+    "nodemon": "^3.1.11"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "dev": "nodemon --exec \"bun run start\" --ext ts --watch src",
+    "start": "tsc && bun src/index.ts"
+  }
+}

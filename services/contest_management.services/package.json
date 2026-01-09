@@ -14,7 +14,7 @@
   "dependencies": {
     "@db/contest-platform": "workspace:*",
     "@handler/contest-platform": "workspace:*",
-    "@kafka_instance/contestplatfrom": "workspace:*",
+    
     "@matrix/contestplatfrom": "workspace:*",
     "@type-of/contest-platform": "workspace:*",
     "@redis_instance/contestplatfrom": "workspace:*",

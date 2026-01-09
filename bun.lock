@@ -200,12 +200,26 @@
         "typescript": "^5",
       },
     },
+    "services/chack_contest_time.services": {
+      "name": "chack_contest_time.services",
+      "dependencies": {
+        "@db/contest-platform": "workspace:*",
+        "@kafka_instance/contestplatfrom": "workspace:*",
+        "@type-of/contest-platform": "workspace:*",
+        "nodemon": "^3.1.11",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "services/contest_management.services": {
       "name": "contest_management.services",
       "dependencies": {
         "@db/contest-platform": "workspace:*",
         "@handler/contest-platform": "workspace:*",
-        "@kafka_instance/contestplatfrom": "workspace:*",
         "@matrix/contestplatfrom": "workspace:*",
         "@redis_instance/contestplatfrom": "workspace:*",
         "@type-of/contest-platform": "workspace:*",
@@ -556,6 +570,8 @@
     "callsites": ["callsites@3.1.0", "", {}, "sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ=="],
 
     "caniuse-lite": ["caniuse-lite@1.0.30001763", "", {}, "sha512-mh/dGtq56uN98LlNX9qdbKnzINhX0QzhiWBFEkFfsFO4QyCvL8YegrJAazCwXIeqkIob8BlZPGM3xdnY+sgmvQ=="],
+
+    "chack_contest_time.services": ["chack_contest_time.services@workspace:services/chack_contest_time.services"],
 
     "chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
 

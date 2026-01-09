@@ -1,5 +1,5 @@
 {
-  "id": "fce057d1-f211-4eda-84bb-7cd96d458fa2",
+  "id": "6c5b7344-a17f-484c-9d09-4fd92e04caa9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -565,6 +565,9 @@
       "schema": "public",
       "values": [
         "activate",
+        "completed",
+        "started",
+        "pending",
         "deactivate"
       ]
     }
