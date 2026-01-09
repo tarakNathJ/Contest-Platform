@@ -24,12 +24,12 @@ interface Tmcq {
 const redis_instance = new redis_service();
 const redis_connect = await redis_instance.connect();
 
-const create_contest_handler = async_function(async (req, res) => {
+const create_contest = async_function(async (req, res) => {
   // @ts-ignore
   const userId = req.user.id;
   const { contest_name, startTime, description } = req.body();
   if (!contest_name || !userId || !description) {
-    new api_error(400, "each field are require");
+    new api_error(400, "All required fields must be provided.");
   }
 
   const [find_this_contest_name_exist_or_not_for_this_organizer] = await db
@@ -110,7 +110,7 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
       (field) => field.trim() == ""
     )
   ) {
-    throw new api_error(400, "each field are require");
+    throw new api_error(400, "All required fields must be provided.");
   }
 
   const [contest_exist_or_not_for_this_user] = await db
@@ -164,7 +164,7 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
     );
 });
 const get_mcqs_by_contest_id = async_function(async (req, res) => {
-  const contestId = req.params;
+  const contestId = req.params.contestId;
   // @ts-ignore
   const userId = req.user.id;
 
@@ -207,6 +207,9 @@ const submit_user_answer = async_function(async (req, res) => {
   const qustionId = req.params;
   const contestId = req.params;
   const { ans, optionId } = req.body;
+  if (!qustionId || !userId || !ans || !optionId) {
+    throw new api_error(400, "All required fields must be provided.");
+  }
 
   const get_contest_exist_or_not: Tmcq[] | any = await redis_instance.getJSON(
     `${contestId}`
@@ -256,6 +259,12 @@ const submit_user_answer = async_function(async (req, res) => {
       .status(201)
       .json(new api_responce(201, {}, "Data saved successfully"));
   }
-
-  
 });
+
+export {
+  create_contest,
+  get_mcqs_by_contest_id,
+  get_organizer__contests,
+  add_and_update_mcq_to_contest,
+  submit_user_answer,
+};
