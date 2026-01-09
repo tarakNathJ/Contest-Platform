@@ -17,6 +17,7 @@
     "@kafka_instance/contestplatfrom": "workspace:*",
     "@matrix/contestplatfrom": "workspace:*",
     "@type-of/contest-platform": "workspace:*",
+    "@redis_instance/contestplatfrom": "workspace:*",
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/response-time": "^2.3.9",
