@@ -8,6 +8,7 @@ config();
 
 export const verify_JWT =async_function (async (req, _, next) => {
   try {
+    console.log("rt")
     const token =
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
@@ -41,7 +42,7 @@ export const verify_JWT =async_function (async (req, _, next) => {
     // console.log(user);
     // @ts-ignore
     req.user = existe_user;
-
+    console.log("rt")
     next();
   } catch (error: any) {
     throw new api_error(
@@ -83,6 +84,7 @@ export const isAdmin = async_function(async (req, _, next) => {
 });
 export const isOrganizer = async_function(async (req, _, next) => {
   try {
+    console.log("dt")
     // @ts-ignore
     if (req.user.role === "admin") {
       throw new api_error(401, "this is not organizer route");
@@ -90,6 +92,7 @@ export const isOrganizer = async_function(async (req, _, next) => {
     } else if (req.user.role === "user") {
       throw new api_error(401, "this is not user route");
     }
+    console.log("dt")
     next();
   } catch (error: any) {
     throw new api_error(401, "role cannot be verified");

@@ -1,7 +1,8 @@
 import { db, contestTable, and, eq, or } from "@db/contest-platform";
 import { is_end, is_start } from "./controller/index.controller";
 import type { TcontestTable } from "@type-of/contest-platform";
-
+import { config } from "dotenv";
+config();
 async function chack_time_for_contest() {
   try {
     while (true) {
@@ -24,6 +25,7 @@ async function chack_time_for_contest() {
           )
         );
 
+        console.log(get_all_contest);
       await new Promise((r) => setTimeout(r, 1000));
 
       if (get_all_contest.length !== 0) {
@@ -43,7 +45,12 @@ async function chack_time_for_contest() {
     }
   } catch (error: any) {
     console.error("error message ", error.messages);
-    process.exit(1);
+    console.error("Error in check_time_for_contest:", error.message || error);
+    console.error("Full error:", error);
+
+    // Don't silently fail - restart the check after a delay
+    // await new Promise((r) => setTimeout(r, 10000));
+    // chack_time_for_contest();
   }
 }
 

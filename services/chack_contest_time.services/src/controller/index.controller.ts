@@ -1,7 +1,8 @@
 import type { TcontestTable } from "@type-of/contest-platform";
-import { kafka_instance } from "@kafka_instance/contestplatfrom";
+import { kafka_instance  } from "@kafka_instance/contestplatfrom";
 import { db, contestTable, eq } from "@db/contest-platform";
-
+import { config } from "dotenv";
+config()
 const client_id: string = process.env.CLIENT_ID!;
 const broker: string = process.env.BROKER!;
 const topic: string = process.env.TOPIC!;
@@ -31,6 +32,7 @@ async function is_start(contest_info: TcontestTable) {
           is_active: true,
         })
         .where(eq(contestTable.id, contest_info.id));
+        console.log(contest_info);
       await new Promise((r) => setTimeout(r, 1000));
       const producer = await getProducer();
       producer.send({

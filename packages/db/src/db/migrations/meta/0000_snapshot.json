@@ -1,5 +1,5 @@
 {
-  "id": "6c5b7344-a17f-484c-9d09-4fd92e04caa9",
+  "id": "472a4297-36b2-46d3-9ea5-5dfdf54106ba",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -45,6 +45,12 @@
         },
         "startTime": {
           "name": "startTime",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endTime": {
+          "name": "endTime",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
@@ -220,8 +226,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "ans": {
-          "name": "ans",
+        "rightAns": {
+          "name": "rightAns",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
@@ -291,7 +297,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "mcq_userId_users_id_fk": {
@@ -335,6 +341,12 @@
             "cycle": false
           }
         },
+        "contest_id": {
+          "name": "contest_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "user_id": {
           "name": "user_id",
           "type": "integer",
@@ -349,14 +361,14 @@
         },
         "ans": {
           "name": "ans",
-          "type": "varchar",
+          "type": "option",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
-        "selected_answer": {
-          "name": "selected_answer",
-          "type": "answer",
-          "typeSchema": "public",
+        "selectedAnswer": {
+          "name": "selectedAnswer",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -398,6 +410,21 @@
           "method": "btree",
           "with": {}
         },
+        "contestIdIdx": {
+          "name": "contestIdIdx",
+          "columns": [
+            {
+              "expression": "contest_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "user_answers_unique_mcq_user": {
           "name": "user_answers_unique_mcq_user",
           "columns": [
@@ -421,6 +448,19 @@
         }
       },
       "foreignKeys": {
+        "user_ans_contest_id_contest_id_fk": {
+          "name": "user_ans_contest_id_contest_id_fk",
+          "tableFrom": "user_ans",
+          "tableTo": "contest",
+          "columnsFrom": [
+            "contest_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "user_ans_user_id_users_id_fk": {
           "name": "user_ans_user_id_users_id_fk",
           "tableFrom": "user_ans",
@@ -541,8 +581,8 @@
     }
   },
   "enums": {
-    "public.answer": {
-      "name": "answer",
+    "public.option": {
+      "name": "option",
       "schema": "public",
       "values": [
         "option1",

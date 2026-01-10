@@ -38,7 +38,7 @@ const create_contest = async_function(async (req, res) => {
   ) {
     new api_error(400, "All required fields must be provided.");
   }
-
+  console.log("mt");
   const [find_this_contest_name_exist_or_not_for_this_organizer] = await db
     .select()
     .from(contestTable)
@@ -48,7 +48,7 @@ const create_contest = async_function(async (req, res) => {
         eq(contestTable.userId, userId)
       )
     );
-
+  console.log("mt");
   if (find_this_contest_name_exist_or_not_for_this_organizer) {
     new api_error(409, " this name allrady exist");
   }
@@ -66,6 +66,7 @@ const create_contest = async_function(async (req, res) => {
     })
     .returning({ id: contestTable.id, title: contestTable.contestName });
 
+  console.log("mt");
   if (!create_new_contest_for_this_organizer) {
     throw new api_error(507, "db operation failed");
   }
@@ -145,7 +146,7 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
       option2: option2,
       option3: option3,
       option4: option4,
-      ans: ans,
+      rightAns: ans,
     })
     .onConflictDoUpdate({
       target: [mcqTable.contestId, mcqTable.title],
@@ -155,7 +156,7 @@ const add_and_update_mcq_to_contest = async_function(async (req, res) => {
         option2: option2,
         option3: option3,
         option4: option4,
-        ans: ans,
+        rightAns: ans,
       },
     })
     .returning({ id: mcqTable.id, title: mcqTable.title });
@@ -221,10 +222,9 @@ const submit_user_answer = async_function(async (req, res) => {
   if (!qustionId || !userId || !ans || !optionId || !contestId) {
     throw new api_error(400, "All required fields must be provided.");
   }
-  console.log(qustionId, contestId, ans, optionId);
 
   const get_contest_exist_or_not: Tmcq[] | any = await redis_instance.getJSON(
-    `${contestId}`
+    `${qustionId}`
   );
 
   if (get_contest_exist_or_not) {
@@ -232,17 +232,22 @@ const submit_user_answer = async_function(async (req, res) => {
       //@ts-ignore
       (data) => data.id == parseInt(qustionId)
     );
+
     const save_user_answer = await db.insert(userAnswerTable).values({
       //@ts-ignore
-      mcqTableId: parseInt(qustionId),
-      ans: ans,
-      optionId: optionId,
-      right_or_wrong: find_qustion_details[0]?.ans == ans.trim() ? true : false,
+      mcqId: parseInt(qustionId),
+      user_id: userId,
+      contest_id: parseInt(contestId),
+      ans: optionId,
+      selectedAnswer: ans,
+      is_correct:
+        find_qustion_details[0]?.rightAns == ans.trim() ? true : false,
     });
     return res
       .status(201)
       .json(new api_responce(201, {}, "Data saved successfully"));
   } else {
+   
     const get_all_qustion_by_contest_id = await db
       .select({
         id: mcqTable.id,
@@ -250,27 +255,33 @@ const submit_user_answer = async_function(async (req, res) => {
         option2: mcqTable.option2,
         option3: mcqTable.option3,
         option4: mcqTable.option4,
-        ans: mcqTable.ans,
+        rightAns: mcqTable.rightAns,
       })
       .from(mcqTable)
       //@ts-ignore
       .where(eq(mcqTable.contestId, parseInt(contestId)));
-
-    redis_instance.setJSON(`${contestId}`, get_all_qustion_by_contest_id, 60);
+    
+    redis_instance.setJSON(`${qustionId}`, get_all_qustion_by_contest_id, 60);
 
     const find_qustion_details = get_all_qustion_by_contest_id.filter(
       //@ts-ignore
       (data) => data.id == parseInt(qustionId)
     );
+    if (!find_qustion_details) {
+      throw new api_error(404, "qustion dose not exit");
+    }
 
     const save_user_answer = await db.insert(userAnswerTable).values({
       mcqId: parseInt(qustionId),
-      userId: userId,
+      user_id: userId,
       contest_id: parseInt(contestId),
-      ans: ans,
-      selectedAnswer: optionId,
-      isCorrect: find_qustion_details[0]?.ans == ans.trim() ? true : false,
+      ans: optionId,
+      selectedAnswer: ans,
+      is_correct:
+        find_qustion_details[0]?.rightAns == ans.trim() ? true : false,
     });
+
+    // console.log(save_user_answer);
 
     return res
       .status(201)

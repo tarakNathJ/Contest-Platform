@@ -208,6 +208,7 @@
         "@db/contest-platform": "workspace:*",
         "@kafka_instance/contestplatfrom": "workspace:*",
         "@type-of/contest-platform": "workspace:*",
+        "dotenv": "^17.2.3",
         "nodemon": "^3.1.11",
       },
       "devDependencies": {

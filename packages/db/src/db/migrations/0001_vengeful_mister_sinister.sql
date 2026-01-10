@@ -1,1 +1,0 @@
-ALTER TABLE "contest" ADD COLUMN "endTime" timestamp with time zone NOT NULL;

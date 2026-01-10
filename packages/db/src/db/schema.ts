@@ -1,3 +1,5 @@
+
+
 import {
   boolean,
   integer,
@@ -6,9 +8,12 @@ import {
   pgEnum,
   uniqueIndex,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
-import { index } from "drizzle-orm/pg-core";
+
+
 export const roleEnum = pgEnum("role", ["admin", "user", "organizer"]);
+
 export const statusEnum = pgEnum("status", [
   "activate",
   "completed",
@@ -17,12 +22,13 @@ export const statusEnum = pgEnum("status", [
   "deactivate",
 ]);
 
-export const answerEnum = pgEnum("answer", [
+export const answerEnum = pgEnum("option", [
   "option1",
   "option2",
   "option3",
   "option4",
 ]);
+
 export const usersTable = pgTable(
   "users",
   {
@@ -37,6 +43,7 @@ export const usersTable = pgTable(
     emailIdx: index("email_idx").on(table.email),
   })
 );
+
 
 export const contestTable = pgTable(
   "contest",
@@ -53,11 +60,12 @@ export const contestTable = pgTable(
     status: statusEnum("status").notNull(),
   },
   (table) => ({
-    userId: index("userIdx").on(table.userId),
-    contestIsActive: index("contestIdx").on(table.contestName, table.is_active),
+    userIdIdx: index("userIdx").on(table.userId),
+    contestIsActiveIdx: index("contestIdx").on(table.contestName, table.is_active),
     contestNameIdx: index("contestNameIdx").on(table.contestName, table.userId),
   })
 );
+
 
 export const mcqTable = pgTable(
   "mcq",
@@ -65,8 +73,7 @@ export const mcqTable = pgTable(
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     contestId: integer("contestId")
       .notNull()
-      .references(() => contestTable.id, { onDelete: "cascade" }),
-
+      .references(() => contestTable.id),
     userId: integer("userId")
       .notNull()
       .references(() => usersTable.id),
@@ -76,40 +83,51 @@ export const mcqTable = pgTable(
     option2: varchar("option2").notNull(),
     option3: varchar("option3").notNull(),
     option4: varchar("option4").notNull(),
-    ans: varchar("ans").notNull(),
+    rightAns: varchar("rightAns").notNull(),
   },
   (table) => ({
-    contestIdIdx: index("mcq_contest_id_idx").on(table.contestId), // This is correct
+    contestIdIdx: index("mcq_contest_id_idx").on(table.contestId),
     userIdIdx: index("mcq_user_id_idx").on(table.userId),
-
     uniqueTitlePerContest: uniqueIndex("mcq_unique_title_per_contest").on(
       table.contestId,
       table.title
     ),
   })
 );
+
+
 export const userAnswerTable = pgTable(
   "user_ans",
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     contest_id: integer("contest_id").references(() => contestTable.id),
-    userId: integer("user_id")
+    user_id: integer("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
     mcqId: integer("mcqId")
       .notNull()
       .references(() => mcqTable.id, { onDelete: "cascade" }),
-    ans: varchar("ans").notNull(),
-    selectedAnswer: answerEnum("selected_answer").notNull(),
-    isCorrect: boolean("is_correct").notNull(),
+    ans: answerEnum("ans").notNull(),
+    selectedAnswer: varchar("selectedAnswer").notNull(),
+    is_correct: boolean("is_correct").notNull(),
   },
   (table) => ({
     mcqIdIdx: index("user_answers_mcq_id_idx").on(table.mcqId),
-    userIdIdx: index("user_answers_user_id_idx").on(table.userId),
+    userIdIdx: index("user_answers_user_id_idx").on(table.user_id),
     contestIdIdx: index("contestIdIdx").on(table.contest_id),
     oneAttemptPerUser: uniqueIndex("user_answers_unique_mcq_user").on(
       table.mcqId,
-      table.userId
+      table.user_id
     ),
   })
 );
+
+
+export type User = typeof usersTable.$inferSelect;
+export type NewUser = typeof usersTable.$inferInsert;
+export type Contest = typeof contestTable.$inferSelect;
+export type NewContest = typeof contestTable.$inferInsert;
+export type Mcq = typeof mcqTable.$inferSelect;
+export type NewMcq = typeof mcqTable.$inferInsert;
+export type UserAnswer = typeof userAnswerTable.$inferSelect;
+export type NewUserAnswer = typeof userAnswerTable.$inferInsert;
