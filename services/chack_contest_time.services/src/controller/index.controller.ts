@@ -34,7 +34,7 @@ async function is_start(contest_info: TcontestTable) {
           },
         ],
       });
-
+      await new Promise((resolve, reject) => setTimeout(resolve, 1000));
       return { status: true };
     } else {
       return { status: false };
@@ -48,3 +48,43 @@ async function is_start(contest_info: TcontestTable) {
     };
   }
 }
+
+async function is_end(contest_info: TcontestTable) {
+  try {
+    await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+
+    if (new Date() > contest_info.endTime) {
+      const update_contest_status = await db
+        .update(contestTable)
+        .set({
+          status: "completed",
+        })
+        .where(eq(contestTable.id, contest_info.id));
+
+      kafka_produser?.send({
+        topic: topic,
+        messages: [
+          {
+            value: JSON.stringify({
+              type: "CONTEST_END",
+              value: contest_info,
+            }),
+          },
+        ],
+      });
+      await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+      return { status: true };
+    } else {
+      return { status: false };
+    }
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return {
+      status: false,
+      error: errorMessage,
+    };
+  }
+}
+
+export { is_end, is_start };

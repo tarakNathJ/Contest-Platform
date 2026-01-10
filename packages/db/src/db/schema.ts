@@ -48,6 +48,7 @@ export const contestTable = pgTable(
     contestName: varchar("contestName", { length: 50 }).notNull().unique(),
     description: varchar("description"),
     startTime: timestamp("startTime", { withTimezone: true }).notNull(),
+    endTime: timestamp("endTime", { withTimezone: true }).notNull(),
     is_active: boolean("is_active").notNull(),
     status: statusEnum("status").notNull(),
   },

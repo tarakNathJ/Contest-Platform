@@ -27,8 +27,15 @@ const redis_connect = await redis_instance.connect();
 const create_contest = async_function(async (req, res) => {
   // @ts-ignore
   const userId = req.user.id;
-  const { contest_name, startTime, description, status } = req.body;
-  if (!contest_name || !userId || !description || !status) {
+  const { contest_name, startTime, endTime, description, status } = req.body;
+  if (
+    !contest_name ||
+    !userId ||
+    !description ||
+    !status ||
+    !endTime ||
+    !startTime
+  ) {
     new api_error(400, "All required fields must be provided.");
   }
 
@@ -53,6 +60,7 @@ const create_contest = async_function(async (req, res) => {
       contestName: contest_name,
       description: description,
       startTime: new Date(startTime),
+      endTime: new Date(endTime),
       is_active: true,
       status: status,
     })

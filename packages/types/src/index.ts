@@ -28,6 +28,7 @@ export interface TcontestTable {
   userId: number;
   contestName: string;
   startTime: Date;
+  endTime: Date;
   is_active: boolean;
   status: Tstatus;
 }
