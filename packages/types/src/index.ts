@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
+
 export type type_of_asyncFunction = (
   req: Request,
   res: Response,
@@ -31,4 +32,15 @@ export interface TcontestTable {
   endTime: Date;
   is_active: boolean;
   status: Tstatus;
+}
+
+export interface ContestParticipant {
+  username: string;
+  totalAttempt: number;
+  correctAttempt: number;
+}
+
+export interface LeaderboardEntry extends ContestParticipant {
+  rank: number;
+  score: number;
 }

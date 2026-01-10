@@ -10,7 +10,8 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "redis": "^5.10.0"
+    "redis": "^5.10.0",
+    "@type-of/contest-platform": "workspace:*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"

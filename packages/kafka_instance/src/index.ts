@@ -15,7 +15,7 @@ class kafka_instance {
     if (this.producer) return this.producer;
     this.producer = this.instance?.producer();
     await this.producer?.connect();
-    return this.producer;
+    return  this.producer;
   }
 
   public async consumer_instance(

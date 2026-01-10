@@ -8,6 +8,13 @@
       "when": 1767996358270,
       "tag": "0000_empty_invaders",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768016873731,
+      "tag": "0001_vengeful_mister_sinister",
+      "breakpoints": true
     }
   ]
 }

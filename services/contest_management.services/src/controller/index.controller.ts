@@ -266,6 +266,7 @@ const submit_user_answer = async_function(async (req, res) => {
     const save_user_answer = await db.insert(userAnswerTable).values({
       mcqId: parseInt(qustionId),
       userId: userId,
+      contest_id: parseInt(contestId),
       ans: ans,
       selectedAnswer: optionId,
       isCorrect: find_qustion_details[0]?.ans == ans.trim() ? true : false,

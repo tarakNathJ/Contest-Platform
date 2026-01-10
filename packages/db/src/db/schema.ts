@@ -92,7 +92,7 @@ export const userAnswerTable = pgTable(
   "user_ans",
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-
+    contest_id: integer("contest_id").references(() => contestTable.id),
     userId: integer("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
@@ -106,7 +106,7 @@ export const userAnswerTable = pgTable(
   (table) => ({
     mcqIdIdx: index("user_answers_mcq_id_idx").on(table.mcqId),
     userIdIdx: index("user_answers_user_id_idx").on(table.userId),
-
+    contestIdIdx: index("contestIdIdx").on(table.contest_id),
     oneAttemptPerUser: uniqueIndex("user_answers_unique_mcq_user").on(
       table.mcqId,
       table.userId
