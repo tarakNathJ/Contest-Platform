@@ -9,6 +9,8 @@ import {
   uniqueIndex,
   timestamp,
   index,
+  jsonb
+  
 } from "drizzle-orm/pg-core";
 
 
@@ -123,6 +125,15 @@ export const userAnswerTable = pgTable(
 );
 
 
+export const contestResultTable = pgTable("contest_result",{
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  contest_id: integer("contest_id").references(() => contestTable.id).unique(),
+  result:jsonb("result").notNull()
+},(table)=>({
+  contestIdx:index("contest_idx").on(table.contest_id)
+}))
+
+export type ContestResult = typeof contestResultTable.$inferSelect
 export type User = typeof usersTable.$inferSelect;
 export type NewUser = typeof usersTable.$inferInsert;
 export type Contest = typeof contestTable.$inferSelect;

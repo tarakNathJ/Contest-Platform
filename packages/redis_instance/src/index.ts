@@ -63,21 +63,21 @@ class redis_service {
       const leaderboardKey = `contest:${contestId}:leaderboard`;
       const metadataKey = `contest:${contestId}:metadata`;
 
-      // Clear existing data
+     
       await this.client.del(leaderboardKey);
       await this.client.del(metadataKey);
 
-      // Add to sorted set (for ranking by score)
+      
       if (participants.length > 0) {
         await this.client.zAdd(
           leaderboardKey,
           participants.map((p) => ({
-            score: p.score, // Use calculated score for ranking
+            score: p.score, 
             value: p.userId.toString(),
           }))
         );
 
-        // Store metadata (correct/total attempts) in hash
+        
         const metadataEntries: any[] = [];
         participants.forEach((p) => {
           metadataEntries.push(
@@ -92,7 +92,7 @@ class redis_service {
 
         await this.client.hSet(metadataKey, metadataEntries);
 
-        // Set expiry if provided
+      
         if (expirySeconds) {
           await this.client.expire(leaderboardKey, expirySeconds);
           await this.client.expire(metadataKey, expirySeconds);
@@ -107,7 +107,7 @@ class redis_service {
     }
   }
 
-  // remove data for leaderboard
+ 
   public async remove_to_leaderboard(contestId: number): Promise<void> {
     const leaderboardKey = `contest:${contestId}:leaderboard`;
     const metadataKey = `contest:${contestId}:metadata`;
@@ -115,7 +115,7 @@ class redis_service {
     await this.client.del(leaderboardKey);
     await this.client.del(metadataKey);
 
-    console.log(`✓ Removed leaderboard for contest ${contestId}`);
+    
   }
 
   public async get_leaderboard_by_contestId(contestId: number): Promise<any> {
@@ -123,7 +123,7 @@ class redis_service {
       const leaderboardKey = `contest:${contestId}:leaderboard`;
       const metadataKey = `contest:${contestId}:metadata`;
 
-      // Get ranked list (highest score first)
+     
       const rankedUsers = await this.client.zRangeWithScores(
         leaderboardKey,
         0,
@@ -132,17 +132,17 @@ class redis_service {
       );
 
       if (!rankedUsers || rankedUsers.length === 0) {
-        console.log(`No leaderboard data found for contest ${contestId}`);
+        
         return [];
       }
 
-      // Get metadata for all users
+      
       const metadata = await this.client.hGetAll(metadataKey);
 
-      // Check if metadata exists
+      
       if (!metadata || Object.keys(metadata).length === 0) {
-        console.warn(`No metadata found for contest ${contestId}`);
-        // Return basic leaderboard without metadata
+       
+        
         return rankedUsers.map((item: any, index: number) => ({
           rank: index + 1,
           userId: parseInt(item.value),
@@ -153,7 +153,7 @@ class redis_service {
         }));
       }
 
-      // Combine data
+      
       const leaderboard = rankedUsers.map((item: any, index: number) => {
         const userId = parseInt(item.value);
         const metadataKey = `user:${userId}`;
@@ -164,13 +164,13 @@ class redis_service {
           score: 0,
         };
 
-        // Parse metadata if it exists
+        
         if (metadata[metadataKey]) {
           try {
             userMetadata = JSON.parse(metadata[metadataKey]);
           } catch (parseError) {
             console.error(
-              `Failed to parse metadata for user ${userId}:`,
+              
               parseError
             );
           }
@@ -194,43 +194,12 @@ class redis_service {
       return leaderboard;
     } catch (error: any) {
       console.error("Error getting leaderboard:", error.message);
-      console.error("Stack trace:", error.stack);
+      
       return [];
     }
   }
 
-  // public async get_leaderboard_by_contestId(contestId: string): Promise<
-  //   {
-  //     rank: number;
-  //     username: string;
-  //     correctAttempt: number;
-  //     totalAttempt: number;
-  //   }[]
-  // > {
-  //   const leaderboardKey = `contest:${contestId}:leaderboard`;
-
-  //   const data = await this.client.zRangeWithScores(leaderboardKey, 0, -1, {
-  //     REV: true,
-  //   });
-
-  //   // @ts-ignore
-  //   return data.map((item, index) => {
-  //     const parts = item.value.split("|");
-
-  //     if (parts.length !== 2) {
-  //       throw new Error(`Invalid leaderboard value: ${item.value}`);
-  //     }
-
-  //     const [totalAttemptStr, username] = parts;
-
-  //     return {
-  //       rank: index + 1,
-  //       username,
-  //       correctAttempt: item.score,
-  //       totalAttempt: Number(totalAttemptStr),
-  //     };
-  //   });
-  // }
+  
 
   /////////////////////////////////////////Redis Lists///////////////////
   // add data

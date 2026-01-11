@@ -8,6 +8,20 @@
       "when": 1768070055949,
       "tag": "0000_lazy_stepford_cuckoos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768085924771,
+      "tag": "0001_whole_clea",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768086082201,
+      "tag": "0002_skinny_sentinels",
+      "breakpoints": true
     }
   ]
 }

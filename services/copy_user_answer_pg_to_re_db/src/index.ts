@@ -2,7 +2,7 @@ import { redis_service } from "@redis_instance/contestplatfrom";
 import { kafka_instance } from "@kafka_instance/contestplatfrom";
 import { CronJob } from "cron";
 import { get_all_ans_for_contest } from "./controller/index.controller";
-
+import { contestResultTable, db } from "@db/contest-platform";
 const redis_list = process.env.CONTEST_KEY_FOR_REDIS_LIST;
 const clientId = process.env.CLIENT_ID;
 const brocker = process.env.BROKER;
@@ -17,7 +17,8 @@ let contest_list: number[] = [];
 export const redis_init = new redis_service();
 redis_init.connect();
 
-
+const data = await redis_init.get_leaderboard_by_contestId(1);
+console.log(data);
 const kafka_init = new kafka_instance(clientId, [brocker]);
 
 const consumer = await kafka_init.consumer_instance(topic, true, groupId);
@@ -30,11 +31,28 @@ consumer?.run({
       console.log(payload);
 
       if (payload.type == "CONTEST_START") {
-        redis_init.array_init_or_push(redis_list,payload.value.id );
+        redis_init.array_init_or_push(redis_list, payload.value.id);
 
         contest_list.push(payload.value.id);
       } else if (payload.type == "CONTEST_END") {
-        redis_init.delete_element_by_value(redis_list, payload.value.id);
+        const get_leaderbord_data =
+          await redis_init.get_leaderboard_by_contestId(payload.value.id);
+
+        // store in db
+        await db
+          .insert(contestResultTable)
+          .values({
+            contest_id: payload.value.id,
+            result: { ...get_leaderbord_data },
+          })
+          .onConflictDoUpdate({
+            target: [contestResultTable.contest_id],
+            set: {
+              result: { ...get_leaderbord_data },
+            },
+          });
+        // delete for db
+        await redis_init.delete_element_by_value(redis_list, payload.value.id);
         const new_contest_list = contest_list.filter(
           (num) => num != payload.value.id
         );
@@ -83,10 +101,40 @@ async function init_cron_worker() {
       console.log("result : ", status);
     }
 
-    job.start()
+    job.start();
     return status ? true : false;
   } catch (error: any) {
     console.log(error.message);
     throw new Error(error.message);
   }
 }
+
+// const arr = [
+//   {
+//     rank: 1,
+//     userId: 1,
+//     score: 30,
+//     correctAttempts: 3,
+//     totalAttempts: 3,
+//     accuracy: 100,
+//   },
+//   {
+//     rank: 2,
+//     userId: 3,
+//     score: 20,
+//     correctAttempts: 2,
+//     totalAttempts: 2,
+//     accuracy: 100,
+//   },
+//   {
+//     rank: 3,
+//     userId: 4,
+//     score: 6,
+//     correctAttempts: 1,
+//     totalAttempts: 3,
+//     accuracy: 33.33,
+//   },
+// ];
+
+// const obj2 = { ...arr };
+// console.log(obj2);

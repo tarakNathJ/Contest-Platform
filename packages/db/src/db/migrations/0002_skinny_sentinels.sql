@@ -1,0 +1,1 @@
+ALTER TABLE "contest_result" ADD CONSTRAINT "contest_result_contest_id_unique" UNIQUE("contest_id");

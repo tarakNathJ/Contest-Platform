@@ -53,18 +53,18 @@ export const get_all_ans_for_contest = async (contestArray: number) => {
         userScore.correctAttempts++;
       }
 
-      // Calculate score: +10 for correct, -2 for wrong
+     
       userScore.score =
         userScore.correctAttempts * 10 -
         (userScore.totalAttempts - userScore.correctAttempts) * 2;
     });
 
-    // Convert map to array
+   
     const userScores = Array.from(userScoresMap.values());
 
     console.log("User scores:", userScores);
 
-    // Add to Redis leaderboard
+    
     const result: boolean = await redis_init.add_to_leaderboard(
       contestArray,
       userScores,
