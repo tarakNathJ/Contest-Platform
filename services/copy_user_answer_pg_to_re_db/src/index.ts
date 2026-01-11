@@ -109,32 +109,5 @@ async function init_cron_worker() {
   }
 }
 
-// const arr = [
-//   {
-//     rank: 1,
-//     userId: 1,
-//     score: 30,
-//     correctAttempts: 3,
-//     totalAttempts: 3,
-//     accuracy: 100,
-//   },
-//   {
-//     rank: 2,
-//     userId: 3,
-//     score: 20,
-//     correctAttempts: 2,
-//     totalAttempts: 2,
-//     accuracy: 100,
-//   },
-//   {
-//     rank: 3,
-//     userId: 4,
-//     score: 6,
-//     correctAttempts: 1,
-//     totalAttempts: 3,
-//     accuracy: 33.33,
-//   },
-// ];
-
 // const obj2 = { ...arr };
 // console.log(obj2);

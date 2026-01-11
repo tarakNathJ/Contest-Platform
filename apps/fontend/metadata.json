@@ -1,7 +1,0 @@
-{
-  "name": "DevQuest: All-in-One Developer Arena",
-  "description": "A high-performance contest platform combining the project-based learning of CodeCrafters, the competitive edge of LeetCode, and the live engagement of Mentimeter.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
-}
