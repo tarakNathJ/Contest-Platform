@@ -53,35 +53,8 @@ export const verify_JWT = async_function(async (req, _, next) => {
   }
 });
 
-export const isUser = async_function(async (req, res, next) => {
-  try {
-    // @ts-ignore
-    if (req.user.role === "organizer") {
-      throw new api_error(401, "this is not organizer route");
-      // @ts-ignore
-    } else if (req.user.role === "admin") {
-      throw new api_error(401, "this is not admin route");
-    }
-    next();
-  } catch (error: any) {
-    throw new api_error(401, "role cannot be verified");
-  }
-});
 
-export const isAdmin = async_function(async (req, _, next) => {
-  try {
-    // @ts-ignore
-    if (req.user.role === "organizer") {
-      throw new api_error(401, "this is not organizer route");
-      // @ts-ignore
-    } else if (req.user.role === "user") {
-      throw new api_error(401, "this is not user route");
-    }
-    next();
-  } catch (error: any) {
-    throw new api_error(401, "role cannot be verified");
-  }
-});
+
 export const isOrganizer = async_function(async (req, _, next) => {
   try {
     console.log("dt");

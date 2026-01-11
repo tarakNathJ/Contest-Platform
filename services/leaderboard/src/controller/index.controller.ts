@@ -5,8 +5,12 @@ import {
 } from "@handler/contest-platform";
 import { db, contestResultTable, eq } from "@db/contest-platform";
 import { getContestResults } from "../utils";
+import {redis_service} from "@redis_instance/contestplatfrom"
 
-const contest_complete = async_function(async (req, res) => {
+
+const redis_init = new redis_service();
+
+export const contest_complete = async_function(async (req, res) => {
   // @ts-ignore
   const userId = req.user.id;
   const contestId = req.params.contestId;
@@ -41,3 +45,5 @@ const contest_complete = async_function(async (req, res) => {
       );
   }
 });
+
+
