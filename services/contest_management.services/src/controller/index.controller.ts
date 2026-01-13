@@ -6,6 +6,7 @@ import {
   mcqTable,
   statusEnum,
   userAnswerTable,
+  countDistinct,
 } from "@db/contest-platform";
 import {
   async_function,
@@ -13,6 +14,7 @@ import {
   api_responce,
 } from "@handler/contest-platform";
 import { redis_service } from "@redis_instance/contestplatfrom";
+import type { PgColumn } from "drizzle-orm/pg-core";
 interface Tmcq {
   id: number;
   option1: string;
@@ -247,7 +249,6 @@ const submit_user_answer = async_function(async (req, res) => {
       .status(201)
       .json(new api_responce(201, {}, "Data saved successfully"));
   } else {
-   
     const get_all_qustion_by_contest_id = await db
       .select({
         id: mcqTable.id,
@@ -260,7 +261,7 @@ const submit_user_answer = async_function(async (req, res) => {
       .from(mcqTable)
       //@ts-ignore
       .where(eq(mcqTable.contestId, parseInt(contestId)));
-    
+
     redis_instance.setJSON(`${qustionId}`, get_all_qustion_by_contest_id, 60);
 
     const find_qustion_details = get_all_qustion_by_contest_id.filter(
@@ -289,10 +290,82 @@ const submit_user_answer = async_function(async (req, res) => {
   }
 });
 
+const get_dash_board_data = async_function(async (req, res) => {
+  // @ts-ignore
+  const userId = req.user.id;
+
+  try {
+    // Single query to get all contest stats
+    const contestStats = await db
+      .select({
+        contestId: contestTable.id,
+        contestName: contestTable.contestName,
+        status: contestTable.status,
+        participants: countDistinct(userAnswerTable.user_id),
+      })
+      .from(contestTable)
+      .leftJoin(
+        userAnswerTable,
+        eq(userAnswerTable.contest_id, contestTable.id)
+      )
+      .where(eq(contestTable.userId, userId))
+      .groupBy(contestTable.id, contestTable.contestName, contestTable.status);
+
+    // Calculate aggregates from the result
+    const totalContests = contestStats.length;
+
+    // Use Set to count unique participants across all contests
+    const allParticipants = new Set();
+    let liveContests = 0;
+    let expiredContests = 0;
+    let upcomingContests = 0;
+
+    const detailedStats = contestStats.map((contest) => {
+      // Count status
+      if (contest.status === "pending") liveContests++;
+      else if (contest.status === "completed") expiredContests++;
+      else if (contest.status === "activate") upcomingContests++;
+
+      return {
+        contestId: contest.contestId,
+        contestName: contest.contestName,
+        participants: Number(contest.participants) || 0,
+        status: contest.status,
+      };
+    });
+
+    // Get total unique participants (single query)
+    const totalParticipantsResult = await db
+      .select({ count: countDistinct(userAnswerTable.user_id) })
+      .from(userAnswerTable)
+      .innerJoin(contestTable, eq(userAnswerTable.contest_id, contestTable.id))
+      .where(eq(contestTable.userId, userId));
+
+    const totalParticipants = Number(totalParticipantsResult[0]?.count) || 0;
+
+    return res.status(200).json(
+      new api_responce(
+        200,
+        {
+          totalContests,
+          totalParticipants,
+          liveContests,
+          expiredContests,
+          upcomingContests,
+          contestStats: detailedStats,
+        },
+        "success fully dashboard data"
+      )
+    );
+  } catch (error: any) {
+    throw new api_error(500, "Failed to fetch dashboard data");
+  }
+});
 export {
   create_contest,
   get_mcqs_by_contest_id,
   get_organizer__contests,
   add_and_update_mcq_to_contest,
   submit_user_answer,
+  get_dash_board_data
 };

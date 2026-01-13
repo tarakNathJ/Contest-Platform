@@ -30,8 +30,7 @@ export const get_all_ans_for_contest = async (contestArray: number) => {
     if (get_all_ans_for_contest.length == 0) {
       return true;
     }
-    console.log("Answers:", get_all_ans_for_contest.length);
-    console.log("Questions:", get_all_qustion_for_contest.length);
+
     const userScoresMap = new Map<number, UserScore>();
 
     get_all_ans_for_contest.forEach((answer) => {

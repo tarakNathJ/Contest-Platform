@@ -1,0 +1,27 @@
+{
+  "name": "boilerplate_generator",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@db/contest-platform": "workspace:*",
+    "@handler/contest-platform": "workspace:*",
+    "@kafka_instance/contestplatfrom": "workspace:*",
+    "@mongo-db/contest-platform": "workspace:*",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/kafkajs": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "kafkajs": "^2.2.4"
+  }
+}

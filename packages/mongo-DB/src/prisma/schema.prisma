@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE")
+}
+
+model problem_statement {
+  id                                String                              @id @default(auto()) @map("_id") @db.ObjectId
+  userId                            Int
+  language                          String
+  languageId                        Int
+  boilerplate                       String
+  inputOutputFormat                 String
+  constraints                       String
+  title                             String
+  isActive                          Boolean                             @default(true)
+  createdAt                         DateTime                            @default(now())
+  updatedAt                         DateTime                            @updatedAt
+  user_attempted_problem_statements user_attempted_problem_statements[]
+  user_code_submissions             user_code_submissions[]
+}
+
+model user_attempted_problem_statements {
+  id                         String                  @id @default(auto()) @map("_id") @db.ObjectId
+  problemStatementId         problem_statement       @relation(fields: [problemStatementIdx], references: [id])
+  problemStatementIdx        String                  @db.ObjectId
+  userId                     Int
+  isCompleted                Boolean                 @default(false)
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
+  user_code_submissions_list user_code_submissions[]
+}
+
+model user_code_submissions {
+  id                               String                            @id @default(auto()) @map("_id") @db.ObjectId
+  problemStatementId               problem_statement                 @relation(fields: [problemStatementIdx], references: [id])
+  problemStatementIdx              String                            @db.ObjectId
+  userAttemptedProblemStatementId  user_attempted_problem_statements @relation(fields: [userAttemptedProblemStatementIdx], references: [id])
+  userAttemptedProblemStatementIdx String                            @db.ObjectId
+  userId                           Int
+  code                             String
+  language                         String
+  createdAt                        DateTime                          @default(now())
+  updatedAt                        DateTime                          @updatedAt
+}

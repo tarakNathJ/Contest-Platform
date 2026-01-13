@@ -1,0 +1,7 @@
+{
+  "name": "DevChallenge Hub",
+  "description": "An industry-level developer contest platform featuring real-time leaderboards, coding challenges, skill matrices, and detailed developer profiles.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

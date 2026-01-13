@@ -38,19 +38,21 @@ consumer?.run({
         const get_leaderbord_data =
           await redis_init.get_leaderboard_by_contestId(payload.value.id);
 
-        // store in db
-        await db
-          .insert(contestResultTable)
-          .values({
-            contest_id: payload.value.id,
-            result: { ...get_leaderbord_data },
-          })
-          .onConflictDoUpdate({
-            target: [contestResultTable.contest_id],
-            set: {
+        if (get_leaderbord_data) {
+          await db
+            .insert(contestResultTable)
+            .values({
+              contest_id: payload.value.id,
               result: { ...get_leaderbord_data },
-            },
-          });
+            })
+            .onConflictDoUpdate({
+              target: [contestResultTable.contest_id],
+              set: {
+                result: { ...get_leaderbord_data },
+              },
+            });
+        }
+       
         // delete for db
         await redis_init.delete_element_by_value(redis_list, payload.value.id);
         const new_contest_list = contest_list.filter(

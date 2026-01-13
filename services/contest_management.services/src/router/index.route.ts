@@ -11,6 +11,7 @@ import {
   get_organizer__contests,
   add_and_update_mcq_to_contest,
   submit_user_answer,
+  get_dash_board_data
 } from "../controller/index.controller";
 
 const routers = express.Router();
@@ -26,5 +27,5 @@ routers
   .route("/add-qustion")
   .post(verify_JWT, isOrganizer, add_and_update_mcq_to_contest);
 routers.route("/submit-answer/:qustionId/:contestId").post(verify_JWT, isUser, submit_user_answer);
-
+routers.route("/dashboard-Info").get(verify_JWT,isOrganizer,get_dash_board_data)
 export default routers;

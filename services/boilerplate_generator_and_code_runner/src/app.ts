@@ -14,7 +14,7 @@ class express_app {
       })
     );
     this.app.use(express.json());
-    this.app.use("/api/contest", routers);
+    this.app.use("/api/qustion-info", routers);
 
   }
 }
