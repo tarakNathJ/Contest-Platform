@@ -31,15 +31,13 @@ model user_attempted_problem_statements {
   isCompleted                Boolean                 @default(false)
   createdAt                  DateTime                @default(now())
   updatedAt                  DateTime                @updatedAt
-  user_code_submissions_list user_code_submissions[]
+ 
 }
 
 model user_code_submissions {
   id                               String                            @id @default(auto()) @map("_id") @db.ObjectId
   problemStatementId               problem_statement                 @relation(fields: [problemStatementIdx], references: [id])
   problemStatementIdx              String                            @db.ObjectId
-  userAttemptedProblemStatementId  user_attempted_problem_statements @relation(fields: [userAttemptedProblemStatementIdx], references: [id])
-  userAttemptedProblemStatementIdx String                            @db.ObjectId
   userId                           Int
   code                             String
   language                         String

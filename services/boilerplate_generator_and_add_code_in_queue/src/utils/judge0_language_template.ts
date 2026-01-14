@@ -32,3 +32,21 @@ export function extractUserFunction(code :string) : string | null {
 
   return  extracted ;
 }
+
+
+export function joingUserFunction(code:string, userFunction: string) : string | null {
+  const startMarker = "// ===== USER FUNCTION =====";
+  const endMarker = "// ===== INPUT & EXECUTION =====";
+  const startIdx = code.indexOf(startMarker);
+  const endIdx = code.indexOf(endMarker);
+  
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+    return null; 
+  }
+
+  const actualStart = startIdx + startMarker.length;
+  
+  const extracted = code.slice(0, actualStart) + userFunction + code.slice(endIdx);
+
+  return extracted;
+}

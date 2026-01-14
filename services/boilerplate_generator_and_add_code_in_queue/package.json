@@ -12,7 +12,7 @@
   "dependencies": {
     "@db/contest-platform": "workspace:*",
     "@handler/contest-platform": "workspace:*",
-    "@kafka_instance/contestplatfrom": "workspace:*",
+    "@redis_instance/contestplatfrom": "workspace:*",
     "@mongo-db/contest-platform": "workspace:*",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

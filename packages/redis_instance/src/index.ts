@@ -63,21 +63,18 @@ class redis_service {
       const leaderboardKey = `contest:${contestId}:leaderboard`;
       const metadataKey = `contest:${contestId}:metadata`;
 
-     
       await this.client.del(leaderboardKey);
       await this.client.del(metadataKey);
 
-      
       if (participants.length > 0) {
         await this.client.zAdd(
           leaderboardKey,
           participants.map((p) => ({
-            score: p.score, 
+            score: p.score,
             value: p.userId.toString(),
           }))
         );
 
-        
         const metadataEntries: any[] = [];
         participants.forEach((p) => {
           metadataEntries.push(
@@ -92,7 +89,6 @@ class redis_service {
 
         await this.client.hSet(metadataKey, metadataEntries);
 
-      
         if (expirySeconds) {
           await this.client.expire(leaderboardKey, expirySeconds);
           await this.client.expire(metadataKey, expirySeconds);
@@ -107,15 +103,12 @@ class redis_service {
     }
   }
 
- 
   public async remove_to_leaderboard(contestId: number): Promise<void> {
     const leaderboardKey = `contest:${contestId}:leaderboard`;
     const metadataKey = `contest:${contestId}:metadata`;
 
     await this.client.del(leaderboardKey);
     await this.client.del(metadataKey);
-
-    
   }
 
   public async get_leaderboard_by_contestId(contestId: number): Promise<any> {
@@ -123,7 +116,6 @@ class redis_service {
       const leaderboardKey = `contest:${contestId}:leaderboard`;
       const metadataKey = `contest:${contestId}:metadata`;
 
-     
       const rankedUsers = await this.client.zRangeWithScores(
         leaderboardKey,
         0,
@@ -132,17 +124,12 @@ class redis_service {
       );
 
       if (!rankedUsers || rankedUsers.length === 0) {
-        
         return [];
       }
 
-      
       const metadata = await this.client.hGetAll(metadataKey);
 
-      
       if (!metadata || Object.keys(metadata).length === 0) {
-       
-        
         return rankedUsers.map((item: any, index: number) => ({
           rank: index + 1,
           userId: parseInt(item.value),
@@ -153,7 +140,6 @@ class redis_service {
         }));
       }
 
-      
       const leaderboard = rankedUsers.map((item: any, index: number) => {
         const userId = parseInt(item.value);
         const metadataKey = `user:${userId}`;
@@ -164,15 +150,11 @@ class redis_service {
           score: 0,
         };
 
-        
         if (metadata[metadataKey]) {
           try {
             userMetadata = JSON.parse(metadata[metadataKey]);
           } catch (parseError) {
-            console.error(
-              
-              parseError
-            );
+            console.error(parseError);
           }
         }
 
@@ -194,12 +176,10 @@ class redis_service {
       return leaderboard;
     } catch (error: any) {
       console.error("Error getting leaderboard:", error.message);
-      
+
       return [];
     }
   }
-
-  
 
   /////////////////////////////////////////Redis Lists///////////////////
   // add data
@@ -221,6 +201,24 @@ class redis_service {
   ): Promise<number> {
     const serializedValue = JSON.stringify(value);
     return await this.client.lRem(key, 0, serializedValue);
+  }
+
+  // /////////////////////////////redis queue/////////////////////////////////////
+  public async enqueue_task<T>(queueName: string, task: T): Promise<void> {
+    const serializedTask = JSON.stringify(task);
+    await this.client.rPush(queueName, serializedTask);
+  }
+
+  public async dequeue_task<T>(queueName: string): Promise<T | null> {
+    const serializedTask = await this.client.lPop(queueName);
+    return serializedTask ? JSON.parse(serializedTask) : null;
+  }
+  async blockingDequeue(
+    queueName: string,
+    timeout: number = 0
+  ): Promise<any | null> {
+    const result = await this.client.blPop(queueName, timeout);
+    return result ? JSON.parse(result.element) : null;
   }
 }
 export { redis_service };

@@ -1,0 +1,15 @@
+{
+  "name": "code_runner",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

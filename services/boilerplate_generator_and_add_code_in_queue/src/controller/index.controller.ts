@@ -7,13 +7,17 @@ import { generateCode } from "../utils/template_generater";
 import prisma from "@mongo-db/contest-platform";
 import {
   extractUserFunction,
+  joingUserFunction,
   judge0Ids,
 } from "../utils/judge0_language_template";
-import { kafka_instance } from "@kafka_instance/contestplatfrom";
+import { redis_service } from "@redis_instance/contestplatfrom";
 
-// import {db } from "@db/contest-platform"
-
-
+const queue_name = process.env.REDIS_QUEUE_NAME;
+if (!queue_name) {
+  throw new Error("REDIS_QUEUE_NAME is not defined in environment variables");
+}
+const redis_instance = new redis_service();
+redis_instance.connect();
 
 const generate_boilerplate_code = async_function(async (req, res) => {
   const { language, signature, description, examples, title, constraints } =
@@ -109,11 +113,64 @@ const get_qustion_by_id = async_function(async (req, res) => {
     );
 });
 
+const submir_code_to_redis = async_function(async (req, res) => {
+  //@ts-ignore
+  const userId = req.user.id;
 
+  const { code, language, problemId } = req.body;
+  if (!code || !language || !problemId) {
+    return new api_error(400, "code, language and problemId are required");
+  }
+
+  const get_problem_by_id = await prisma.problem_statement.findFirst({
+    where: {
+      id: problemId,
+    },
+  });
+  if (!get_problem_by_id) {
+    return new api_error(404, "Problem not found");
+  }
+
+  const joinedCode: string | null = joingUserFunction(
+    get_problem_by_id.boilerplate,
+    code
+  );
+  if (!joinedCode) {
+    return new api_error(500, "Failed to join user code with boilerplate");
+  }
+
+  const userCodeSubmission = await prisma.user_code_submissions.create({
+    data: {
+      userId: userId,
+      problemStatementIdx: get_problem_by_id.id,
+      code: joinedCode,
+      language: language,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+  await redis_instance.enqueue_task(queue_name, {
+    joinedCode,
+    language,
+    userId,
+    problemId,
+    submissionId: userCodeSubmission.id,
+  });
+
+  return res.status(200).json(
+    new api_responce(
+      200,
+      {
+        submissionId: userCodeSubmission.id,
+      },
+      " Code submitted successfully and added to the queue "
+    )
+  );
+});
 
 export {
   generate_boilerplate_code,
   get_all_qustion_templates,
   get_qustion_by_id,
+  submir_code_to_redis,
 };
-
